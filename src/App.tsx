@@ -75,7 +75,7 @@ function App() {
         toggleTimer();
     }
 
-    const reset = () => {
+    const handleReset = () => {
         setIsCounting(false);
         setElapsedTime(0);
         setFirstTimePunched(undefined);
@@ -115,7 +115,7 @@ function App() {
             <div className="absolute flex flex-col top-3 left-3">
                 <button 
                     className="px-3 py-1 mb-4 font-bold text-red-700 uppercase bg-red-200 border border-red-500 rounded-lg mb-1px-4 hover:bg-red-500 hover:text-white hover:border-transparent"
-                    onClick={reset}
+                    onClick={handleReset}
                 >
                     Reset
                 </button>
