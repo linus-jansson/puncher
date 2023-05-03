@@ -36,7 +36,6 @@ function App() {
     const [timeToSubtract, setTimeToSubtract] = useState(0);
     
     const handleInteraction = (e: KeyboardEvent<HTMLDivElement> | any) => {
-        console.log(e.key)
         if (e.type === 'keyup' && e.key !== ' ') return;
         let miliNow = Date.now();
         // Event handler for when the user interact with the timer, IE pressing spacebar eller clicking the timer
@@ -106,22 +105,25 @@ function App() {
             onKeyUp={handleInteraction}
             tabIndex={0}
         >   
+        <div className="absolute flex flex-col top-3 left-3">
             <button 
-                className="absolute top-0 left-0 px-4 py-2 font-semibold text-blue-700 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent"
+                className="px-3 py-1 mb-4 font-semibold text-red-700 bg-white border border-red-500 rounded mb-1px-4 hover:bg-red-500 hover:text-white hover:border-transparent"
                 onClick={reset}
-                >
+            >
                 Reset
             </button>
+            <button
+                className='px-3 py-1 font-semibold text-blue-700 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent'
+                onClick={handleInteraction}
+            >
+                    {isCounting ? "Pause" : "Start"}
+            </button>
+        </div>
             <div>
                 <h1 className={`text-5xl font-bold ${isCounting ? "text-red-500": "text-white"}`}>
                 {formatTime(elapsedTime)}
                 </h1>
-                <button 
-                    className='px-3 py-1 font-semibold text-blue-700 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent'
-                    onClick={handleInteraction}
-                    >
-                    {isCounting ? "Pause" : "Start"}
-                </button>
+                
             </div>
         </div>
     )
