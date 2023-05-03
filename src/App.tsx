@@ -35,10 +35,9 @@ function App() {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [timeToSubtract, setTimeToSubtract] = useState(0);
     
-  
-    const handleInteraction = (e: KeyboardEvent<HTMLDivElement>) => {
+    const handleInteraction = (e: KeyboardEvent<HTMLDivElement> | any) => {
         console.log(e.key)
-        if (e.key !== ' ') return;
+        if (e.type === 'keyup' && e.key !== ' ') return;
         let miliNow = Date.now();
         // Event handler for when the user interact with the timer, IE pressing spacebar eller clicking the timer
 
@@ -49,6 +48,7 @@ function App() {
             // If the user is resuming the timer, we need to subtract the elapsed time while the timer was paused from time state
             if (lastPausedTime !== undefined) {
                 setTimeToSubtract(prev => prev + (miliNow - lastPausedTime));
+                window.localStorage.setItem('timeToSubtract', (timeToSubtract + (miliNow - lastPausedTime)).toString());
                 // reset the lastTimePaused to undefined
                 setLastPausedTime(undefined);
             } else if (firstTimePunched === undefined) {
@@ -56,7 +56,7 @@ function App() {
                 window.localStorage.setItem('firstTimePunched', miliNow.toString());
             }
         }
-
+        // setElapsedTime(() => CalculateTimeElapsed(firstTimePunched || 0, miliNow, timeToSubtract));
         setIsCounting(prev => !prev);
     }
 
@@ -74,18 +74,27 @@ function App() {
 
         // If the user refreshes the page
         // we need to get the previous state from localStorage
-        let isCounting = window.localStorage.getItem('isCounting');
-        let firstTimePunched = window.localStorage.getItem('firstTimePunched');
+        let _isCounting = window.localStorage.getItem('isCounting') === 'true';
+        let _firstTimePunched = parseInt(window.localStorage.getItem('firstTimePunched')!, 10);
+        let _timeElapsed = parseInt(window.localStorage.getItem('elapsedTime')!, 10) || undefined;
+        let _timeToSubtract = parseInt(window.localStorage.getItem('timeToSubtract')!, 10) || 0;
 
-        setIsCounting(isCounting === 'true');
-        setFirstTimePunched(parseInt(firstTimePunched!, 10) || undefined);
+        setIsCounting(_isCounting );
+        setFirstTimePunched(_firstTimePunched || undefined);
+        setTimeToSubtract(_timeToSubtract);
+
+        if (_timeElapsed !== undefined) {
+            setElapsedTime(_timeElapsed);
+        }
 
     }, [])
     
     useEffect(() => {
         const tickInterval = setInterval(() => {
             if (!isCounting || firstTimePunched == undefined) return;
-            setElapsedTime(() => CalculateTimeElapsed(firstTimePunched || 0, Date.now(), timeToSubtract))
+            let newTimeElapsed = CalculateTimeElapsed(firstTimePunched || 0, Date.now(), timeToSubtract);
+            setElapsedTime(newTimeElapsed);
+            window.localStorage.setItem('elapsedTime', newTimeElapsed.toString());
         }
         , 1000)
         
@@ -107,6 +116,12 @@ function App() {
                 <h1 className={`text-5xl font-bold ${isCounting ? "text-red-500": "text-white"}`}>
                 {formatTime(elapsedTime)}
                 </h1>
+                <button 
+                    className='px-3 py-1 font-semibold text-blue-700 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent'
+                    onClick={handleInteraction}
+                    >
+                    {isCounting ? "Pause" : "Start"}
+                </button>
             </div>
         </div>
     )
