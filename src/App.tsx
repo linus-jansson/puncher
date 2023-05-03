@@ -29,36 +29,50 @@ function CalculateTimeElapsed(startTime:number, endTime:number, timeToSubtract:n
 }
 
 function App() {
-    const [isCounting, setIsCounting] = useState(false);
-    const [firstTimePunched, setFirstTimePunched] = useState<number | undefined>(undefined);
-    const [lastPausedTime, setLastPausedTime] = useState<number | undefined>(undefined);
-    const [elapsedTime, setElapsedTime] = useState(0);
-    const [timeToSubtract, setTimeToSubtract] = useState(0);
+    const [isCounting, setIsCounting] = 
+        useState(() =>  window.localStorage.getItem('isCounting') === 'true');
     
+    const [firstTimePunched, setFirstTimePunched] = 
+        useState<number | undefined>(() => parseInt(window.localStorage.getItem('firstTimePunched')!, 10) || undefined);
+    
+    const [lastPausedTime, setLastPausedTime] = 
+        useState<number | undefined>(() => parseInt(window.localStorage.getItem('lastPausedTime')!, 10) || undefined);
+    
+    const [elapsedTime, setElapsedTime] = 
+        useState(() => parseInt(window.localStorage.getItem('elapsedTime')!, 10) || 0);
+
+    const [timeToSubtract, setTimeToSubtract] = 
+        useState(() => parseInt(window.localStorage.getItem('timeToSubtract')!, 10) || 0);
+    
+    const pauseTimer = () => {
+        let miliNow = Date.now();
+        setLastPausedTime(miliNow);
+        let currentElapsedTime = CalculateTimeElapsed(firstTimePunched || 0, miliNow, timeToSubtract);
+        setElapsedTime(currentElapsedTime);
+    }
+
+    const resumeOrStart = () => {
+        let miliNow = Date.now();
+        if (lastPausedTime !== undefined) {
+            setTimeToSubtract(prev => prev + (miliNow - lastPausedTime!));
+            // reset the lastTimePaused to undefined
+            setLastPausedTime(undefined);
+        } else if (firstTimePunched === undefined) {
+            setFirstTimePunched(miliNow);
+        }
+    }
+
+    const toggleTimer = () => {
+        setIsCounting(prev => !prev);
+    }
+
     const handleInteraction = (e: KeyboardEvent<HTMLDivElement> | any) => {
         if (e.type === 'keyup' && e.key !== ' ') return;
-        let miliNow = Date.now();
+
         // If the user is pausing the timer, we need to set the lastPausedTime to the current time
-        if (isCounting) {
-            setLastPausedTime(miliNow);
-            window.localStorage.setItem('lastPausedTime', miliNow.toString());
-            let currentElapsedTime = CalculateTimeElapsed(firstTimePunched || 0, miliNow, timeToSubtract);
-            setElapsedTime(currentElapsedTime);
-        } else {
-            // If the user is resuming the timer, we need to subtract the elapsed time while the timer was paused from time state
-            if (lastPausedTime !== undefined) {
-                setTimeToSubtract(prev => prev + (miliNow - lastPausedTime));
-                window.localStorage.setItem('timeToSubtract', (timeToSubtract).toString());
-                // reset the lastTimePaused to undefined
-                setLastPausedTime(undefined);
-                window.localStorage.removeItem('lastPausedTime');
-            } else if (firstTimePunched === undefined) {
-                setFirstTimePunched(miliNow);
-                window.localStorage.setItem('firstTimePunched', miliNow.toString());
-            }
-        }
-        // setElapsedTime(() => CalculateTimeElapsed(firstTimePunched || 0, miliNow, timeToSubtract));
-        setIsCounting(prev => !prev);
+        // If the user is resuming the timer, we need to subtract the elapsed time while the timer was paused from time state
+        (isCounting) ? pauseTimer() : resumeOrStart();
+        toggleTimer();
     }
 
     const reset = () => {
@@ -73,24 +87,15 @@ function App() {
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        // If the user refreshes the page
-        // we need to get the previous state from localStorage
-        let _isCounting = window.localStorage.getItem('isCounting') === 'true';
-        let _firstTimePunched = parseInt(window.localStorage.getItem('firstTimePunched')!, 10);
-        let _timeElapsed = parseInt(window.localStorage.getItem('elapsedTime')!, 10) || undefined;
-        let _timeToSubtract = parseInt(window.localStorage.getItem('timeToSubtract')!, 10) || 0;
-        let _lastPausedTime = parseInt(window.localStorage.getItem('lastPausedTime')!, 10) || undefined;
+        window.localStorage.setItem('isCounting', isCounting.toString());
+        window.localStorage.setItem('elapsedTime', elapsedTime.toString());
+        window.localStorage.setItem('timeToSubtract', timeToSubtract.toString());
+        window.localStorage.setItem('firstTimePunched', (firstTimePunched || 0).toString());
+        window.localStorage.setItem('lastPausedTime', (lastPausedTime || 0).toString());
 
-        setIsCounting(_isCounting );
-        setFirstTimePunched(_firstTimePunched || undefined);
-        setTimeToSubtract(_timeToSubtract);
-        setLastPausedTime(_lastPausedTime);
+    }, [isCounting, firstTimePunched, lastPausedTime, elapsedTime, timeToSubtract])
 
-        if (_timeElapsed !== undefined) {
-            setElapsedTime(_timeElapsed);
-        }
-
-    }, [])
+    
     
     useEffect(() => {
         const tickInterval = setInterval(() => {
