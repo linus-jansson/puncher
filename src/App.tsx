@@ -102,7 +102,7 @@ function App() {
     }, [isCounting, firstTimePunched])
 
     return (
-        <div className="grid h-screen place-items-center bg-stone-800" 
+        <div className="grid h-screen place-items-center" 
             onKeyUp={handleInteraction}
             tabIndex={0}
         >   
