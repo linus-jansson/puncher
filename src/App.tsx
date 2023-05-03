@@ -95,8 +95,6 @@ function App() {
 
     }, [isCounting, firstTimePunched, lastPausedTime, elapsedTime, timeToSubtract])
 
-    
-    
     useEffect(() => {
         const tickInterval = setInterval(() => {
             if (!isCounting || firstTimePunched == undefined) return;
