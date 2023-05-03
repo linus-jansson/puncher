@@ -105,20 +105,20 @@ function App() {
             onKeyUp={handleInteraction}
             tabIndex={0}
         >   
-        <div className="absolute flex flex-col top-3 left-3">
-            <button 
-                className="px-3 py-1 mb-4 font-semibold text-red-700 bg-white border border-red-500 rounded mb-1px-4 hover:bg-red-500 hover:text-white hover:border-transparent"
-                onClick={reset}
-            >
-                Reset
-            </button>
-            <button
-                className='px-3 py-1 font-semibold text-blue-700 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent'
-                onClick={handleInteraction}
-            >
-                    {isCounting ? "Pause" : "Start"}
-            </button>
-        </div>
+            <div className="absolute flex flex-col top-3 left-3">
+                <button 
+                    className="px-3 py-1 mb-4 font-semibold text-red-700 bg-white border border-red-500 rounded mb-1px-4 hover:bg-red-500 hover:text-white hover:border-transparent"
+                    onClick={reset}
+                >
+                    Reset
+                </button>
+                <button
+                    className='px-3 py-1 font-semibold text-blue-700 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent'
+                    onClick={handleInteraction}
+                >
+                        {isCounting ? "Pause" : "Start"}
+                </button>
+            </div>
             <div>
                 <h1 className={`text-5xl font-bold ${isCounting ? "text-red-500": "text-white"}`}>
                 {formatTime(elapsedTime)}
