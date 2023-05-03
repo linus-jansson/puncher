@@ -38,11 +38,11 @@ function App() {
     const handleInteraction = (e: KeyboardEvent<HTMLDivElement> | any) => {
         if (e.type === 'keyup' && e.key !== ' ') return;
         let miliNow = Date.now();
-        // Event handler for when the user interact with the timer, IE pressing spacebar eller clicking the timer
-
         // If the user is pausing the timer, we need to set the lastPausedTime to the current time
         if (isCounting) {
             setLastPausedTime(miliNow);
+            let currentElapsedTime = CalculateTimeElapsed(firstTimePunched || 0, miliNow, timeToSubtract);
+            setElapsedTime(currentElapsedTime);
         } else {
             // If the user is resuming the timer, we need to subtract the elapsed time while the timer was paused from time state
             if (lastPausedTime !== undefined) {
@@ -107,13 +107,13 @@ function App() {
         >   
             <div className="absolute flex flex-col top-3 left-3">
                 <button 
-                    className="px-3 py-1 mb-4 font-semibold text-red-700 bg-white border border-red-500 rounded mb-1px-4 hover:bg-red-500 hover:text-white hover:border-transparent"
+                    className="px-3 py-1 mb-4 font-bold text-red-700 uppercase bg-red-200 border border-red-500 rounded-lg mb-1px-4 hover:bg-red-500 hover:text-white hover:border-transparent"
                     onClick={reset}
                 >
                     Reset
                 </button>
                 <button
-                    className='px-3 py-1 font-semibold text-blue-700 bg-white border border-blue-500 rounded hover:bg-blue-500 hover:text-white hover:border-transparent'
+                    className='px-3 py-1 font-bold text-blue-700 uppercase bg-blue-200 border border-blue-500 rounded-lg hover:bg-blue-500 hover:text-white hover:border-transparent'
                     onClick={handleInteraction}
                 >
                         {isCounting ? "Pause" : "Start"}
