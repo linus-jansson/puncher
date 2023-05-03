@@ -41,15 +41,17 @@ function App() {
         // If the user is pausing the timer, we need to set the lastPausedTime to the current time
         if (isCounting) {
             setLastPausedTime(miliNow);
+            window.localStorage.setItem('lastPausedTime', miliNow.toString());
             let currentElapsedTime = CalculateTimeElapsed(firstTimePunched || 0, miliNow, timeToSubtract);
             setElapsedTime(currentElapsedTime);
         } else {
             // If the user is resuming the timer, we need to subtract the elapsed time while the timer was paused from time state
             if (lastPausedTime !== undefined) {
                 setTimeToSubtract(prev => prev + (miliNow - lastPausedTime));
-                window.localStorage.setItem('timeToSubtract', (timeToSubtract + (miliNow - lastPausedTime)).toString());
+                window.localStorage.setItem('timeToSubtract', (timeToSubtract).toString());
                 // reset the lastTimePaused to undefined
                 setLastPausedTime(undefined);
+                window.localStorage.removeItem('lastPausedTime');
             } else if (firstTimePunched === undefined) {
                 setFirstTimePunched(miliNow);
                 window.localStorage.setItem('firstTimePunched', miliNow.toString());
@@ -77,10 +79,12 @@ function App() {
         let _firstTimePunched = parseInt(window.localStorage.getItem('firstTimePunched')!, 10);
         let _timeElapsed = parseInt(window.localStorage.getItem('elapsedTime')!, 10) || undefined;
         let _timeToSubtract = parseInt(window.localStorage.getItem('timeToSubtract')!, 10) || 0;
+        let _lastPausedTime = parseInt(window.localStorage.getItem('lastPausedTime')!, 10) || undefined;
 
         setIsCounting(_isCounting );
         setFirstTimePunched(_firstTimePunched || undefined);
         setTimeToSubtract(_timeToSubtract);
+        setLastPausedTime(_lastPausedTime);
 
         if (_timeElapsed !== undefined) {
             setElapsedTime(_timeElapsed);
